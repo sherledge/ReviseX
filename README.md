@@ -14,8 +14,8 @@ A **Flutter-powered** quiz application with SQLite integration, subject-wise per
 ## Installation 🛠
 1. **Clone the repository:**
    ```sh
-   git clone https://github.com/YOUR_USERNAME/quiz-app.git
-   cd quiz-app
+   git clone https://github.com/sherledge/ReviseX.git
+   cd ReviseX
    ```
 2. **Install dependencies:**
    ```sh
@@ -64,10 +64,4 @@ CREATE TABLE quiz (
 3. **Commit your changes**: `git commit -m "Added new feature"`
 4. **Push to GitHub**: `git push origin feature-name`
 5. **Create a Pull Request**
-
-## License 📜
-This project is licensed under the MIT License.
-
----
-🌟 **Star this repository** if you like this project!
 
