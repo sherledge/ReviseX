@@ -4,9 +4,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'database.dart';
 import 'providers.dart';
+import 'package:lottie/lottie.dart'; // ✅ Import Lottie
+
+enum QuizType { standard, custom, ai }
 
 class LoadingPage extends ConsumerStatefulWidget {
-  const LoadingPage({super.key});
+  final QuizType quizType; // ✅ Accepts quiz type
+
+  const LoadingPage({super.key, required this.quizType});
 
   @override
   ConsumerState<LoadingPage> createState() => _LoadingPageState();
@@ -14,7 +19,6 @@ class LoadingPage extends ConsumerStatefulWidget {
 
 class _LoadingPageState extends ConsumerState<LoadingPage> {
   int _dotCount = 0; // For animated "..." effect
-  bool _showImage = false; // Ensure fade-in happens only once
 
   @override
   void initState() {
@@ -22,14 +26,7 @@ class _LoadingPageState extends ConsumerState<LoadingPage> {
     _startLoadingAnimation();
     _loadQuestions();
 
-    // ✅ Start fade-in effect only once
-    Future.delayed(const Duration(milliseconds: 100), () {
-      if (mounted) {
-        setState(() {
-          _showImage = true;
-        });
-      }
-    });
+
   }
 
   void _startLoadingAnimation() {
@@ -45,25 +42,38 @@ class _LoadingPageState extends ConsumerState<LoadingPage> {
     });
   }
 
- void _loadQuestions() async {
-  final db = ref.read(databaseProvider);
-  final questions = await db.getRandomQuestions(); // ✅ Fetch questions
+  void _loadQuestions() async {
+    final db = ref.read(databaseProvider);
 
-  if (questions.isNotEmpty) {
-    ref.read(totalQuestionsProvider.notifier).state = questions.length;
-    ref.read(quizQuestionsStateProvider.notifier).state = questions; // ✅ Store in StateProvider
+    if (widget.quizType == QuizType.custom) {
+      // ✅ Go to Custom Quiz Setup
+      await Future.delayed(const Duration(seconds: 2)); // Short delay for animation
+      if (mounted) context.go('/custom_quiz_setup');
+      return;
+    }
+
+    List<QuizData> questions = [];
+
+    if (widget.quizType == QuizType.standard) {
+      questions = await db.getRandomQuestions(); // ✅ Standard Quiz Questions
+    } else if (widget.quizType == QuizType.ai) {
+      questions = await db.generatePersonalizedQuiz(ref); // ✅ AI-Based Questions
+    }
+
+    if (questions.isNotEmpty) {
+      ref.read(totalQuestionsProvider.notifier).state = questions.length;
+      ref.read(quizQuestionsStateProvider.notifier).state = questions; // ✅ Store in StateProvider
+    }
+
+    // ✅ Wait for 3 seconds before navigating to Quiz Page
+    await Future.delayed(const Duration(seconds: 3));
+    if (mounted) context.go('/quiz');
   }
-
-  // ✅ Wait for 3 seconds before navigating to Quiz Page
-  await Future.delayed(const Duration(seconds: 3));
-  if (mounted) context.go('/quiz');
-}
-
 
   @override
   Widget build(BuildContext context) {
     // Dynamic dots for animation
-    String generatingText = "Generating" + "." * _dotCount;
+    String generatingText = "Loading" + "." * _dotCount;
 
     return Scaffold(
       backgroundColor: const Color(0xFF2B223E), // ✅ Match theme background
@@ -73,26 +83,23 @@ class _LoadingPageState extends ConsumerState<LoadingPage> {
         children: [
           const Spacer(), // Push content to center
 
-          // ✅ Animated Fade-in Emoji Image
-          AnimatedOpacity(
-            opacity: _showImage ? 1.0 : 0.0,
-            duration: const Duration(milliseconds: 800),
-            child: Image.asset(
-              'assets/images/emoji2.png',
-              width: 320,
-              height: 160,
-            ),
-          ),
 
+          SizedBox(
+            width: 200, 
+            height: 200,
+            child: Lottie.asset('assets/animations/jumpinganim.json'), // ✅ Animated emoji
+          ),
           const SizedBox(height: 20),
 
           // ✅ Fun loading text (More descriptive & engaging)
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 40),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40),
             child: Text(
-              "Hold on tight! 🚀\nYour brain is about to go on a knowledge adventure. Get ready to test your skills!",
+              widget.quizType == QuizType.custom
+                  ? "Setting up your Custom Quiz 🎛️\nChoose your subjects and preferences!"
+                  : "Hold on tight! 🚀\nYour brain is about to go on a knowledge adventure. Get ready to test your skills!",
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 16,
                 color: Colors.white70,
               ),

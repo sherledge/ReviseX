@@ -38,7 +38,11 @@ android {
         }
     }
 }
-
+dependencies {
+    implementation 'org.tensorflow:tensorflow-lite-gpu:2.15.0' // or replace with latest version.
+    //If you are using play services.
+    //implementation 'com.google.android.gms:play-services-tflite-gpu:16.1.0' //or latest play services version.
+}
 flutter {
     source = "../.."
 }

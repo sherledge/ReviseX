@@ -66,7 +66,7 @@ class $QuizTable extends Quiz with TableInfo<$QuizTable, QuizData> {
       'times_asked', aliasedName, false,
       type: DriftSqlType.int,
       requiredDuringInsert: false,
-      defaultValue: const Constant(0));
+      defaultValue: Constant(0));
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -465,15 +465,244 @@ class QuizCompanion extends UpdateCompanion<QuizData> {
   }
 }
 
+class $SubjectScoresTable extends SubjectScores
+    with TableInfo<$SubjectScoresTable, SubjectScore> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $SubjectScoresTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _subjectMeta =
+      const VerificationMeta('subject');
+  @override
+  late final GeneratedColumn<String> subject = GeneratedColumn<String>(
+      'subject', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _correctMeta =
+      const VerificationMeta('correct');
+  @override
+  late final GeneratedColumn<int> correct = GeneratedColumn<int>(
+      'correct', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: Constant(0));
+  static const VerificationMeta _totalMeta = const VerificationMeta('total');
+  @override
+  late final GeneratedColumn<int> total = GeneratedColumn<int>(
+      'total', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: Constant(0));
+  @override
+  List<GeneratedColumn> get $columns => [subject, correct, total];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'subject_scores';
+  @override
+  VerificationContext validateIntegrity(Insertable<SubjectScore> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('subject')) {
+      context.handle(_subjectMeta,
+          subject.isAcceptableOrUnknown(data['subject']!, _subjectMeta));
+    } else if (isInserting) {
+      context.missing(_subjectMeta);
+    }
+    if (data.containsKey('correct')) {
+      context.handle(_correctMeta,
+          correct.isAcceptableOrUnknown(data['correct']!, _correctMeta));
+    }
+    if (data.containsKey('total')) {
+      context.handle(
+          _totalMeta, total.isAcceptableOrUnknown(data['total']!, _totalMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {subject};
+  @override
+  SubjectScore map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return SubjectScore(
+      subject: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}subject'])!,
+      correct: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}correct'])!,
+      total: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}total'])!,
+    );
+  }
+
+  @override
+  $SubjectScoresTable createAlias(String alias) {
+    return $SubjectScoresTable(attachedDatabase, alias);
+  }
+}
+
+class SubjectScore extends DataClass implements Insertable<SubjectScore> {
+  final String subject;
+  final int correct;
+  final int total;
+  const SubjectScore(
+      {required this.subject, required this.correct, required this.total});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['subject'] = Variable<String>(subject);
+    map['correct'] = Variable<int>(correct);
+    map['total'] = Variable<int>(total);
+    return map;
+  }
+
+  SubjectScoresCompanion toCompanion(bool nullToAbsent) {
+    return SubjectScoresCompanion(
+      subject: Value(subject),
+      correct: Value(correct),
+      total: Value(total),
+    );
+  }
+
+  factory SubjectScore.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return SubjectScore(
+      subject: serializer.fromJson<String>(json['subject']),
+      correct: serializer.fromJson<int>(json['correct']),
+      total: serializer.fromJson<int>(json['total']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'subject': serializer.toJson<String>(subject),
+      'correct': serializer.toJson<int>(correct),
+      'total': serializer.toJson<int>(total),
+    };
+  }
+
+  SubjectScore copyWith({String? subject, int? correct, int? total}) =>
+      SubjectScore(
+        subject: subject ?? this.subject,
+        correct: correct ?? this.correct,
+        total: total ?? this.total,
+      );
+  SubjectScore copyWithCompanion(SubjectScoresCompanion data) {
+    return SubjectScore(
+      subject: data.subject.present ? data.subject.value : this.subject,
+      correct: data.correct.present ? data.correct.value : this.correct,
+      total: data.total.present ? data.total.value : this.total,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SubjectScore(')
+          ..write('subject: $subject, ')
+          ..write('correct: $correct, ')
+          ..write('total: $total')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(subject, correct, total);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is SubjectScore &&
+          other.subject == this.subject &&
+          other.correct == this.correct &&
+          other.total == this.total);
+}
+
+class SubjectScoresCompanion extends UpdateCompanion<SubjectScore> {
+  final Value<String> subject;
+  final Value<int> correct;
+  final Value<int> total;
+  final Value<int> rowid;
+  const SubjectScoresCompanion({
+    this.subject = const Value.absent(),
+    this.correct = const Value.absent(),
+    this.total = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  SubjectScoresCompanion.insert({
+    required String subject,
+    this.correct = const Value.absent(),
+    this.total = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : subject = Value(subject);
+  static Insertable<SubjectScore> custom({
+    Expression<String>? subject,
+    Expression<int>? correct,
+    Expression<int>? total,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (subject != null) 'subject': subject,
+      if (correct != null) 'correct': correct,
+      if (total != null) 'total': total,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  SubjectScoresCompanion copyWith(
+      {Value<String>? subject,
+      Value<int>? correct,
+      Value<int>? total,
+      Value<int>? rowid}) {
+    return SubjectScoresCompanion(
+      subject: subject ?? this.subject,
+      correct: correct ?? this.correct,
+      total: total ?? this.total,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (subject.present) {
+      map['subject'] = Variable<String>(subject.value);
+    }
+    if (correct.present) {
+      map['correct'] = Variable<int>(correct.value);
+    }
+    if (total.present) {
+      map['total'] = Variable<int>(total.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SubjectScoresCompanion(')
+          ..write('subject: $subject, ')
+          ..write('correct: $correct, ')
+          ..write('total: $total, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $QuizTable quiz = $QuizTable(this);
+  late final $SubjectScoresTable subjectScores = $SubjectScoresTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities => [quiz];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [quiz, subjectScores];
 }
 
 typedef $$QuizTableCreateCompanionBuilder = QuizCompanion Function({
@@ -694,9 +923,154 @@ typedef $$QuizTableProcessedTableManager = ProcessedTableManager<
     (QuizData, BaseReferences<_$AppDatabase, $QuizTable, QuizData>),
     QuizData,
     PrefetchHooks Function()>;
+typedef $$SubjectScoresTableCreateCompanionBuilder = SubjectScoresCompanion
+    Function({
+  required String subject,
+  Value<int> correct,
+  Value<int> total,
+  Value<int> rowid,
+});
+typedef $$SubjectScoresTableUpdateCompanionBuilder = SubjectScoresCompanion
+    Function({
+  Value<String> subject,
+  Value<int> correct,
+  Value<int> total,
+  Value<int> rowid,
+});
+
+class $$SubjectScoresTableFilterComposer
+    extends Composer<_$AppDatabase, $SubjectScoresTable> {
+  $$SubjectScoresTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get subject => $composableBuilder(
+      column: $table.subject, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get correct => $composableBuilder(
+      column: $table.correct, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get total => $composableBuilder(
+      column: $table.total, builder: (column) => ColumnFilters(column));
+}
+
+class $$SubjectScoresTableOrderingComposer
+    extends Composer<_$AppDatabase, $SubjectScoresTable> {
+  $$SubjectScoresTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get subject => $composableBuilder(
+      column: $table.subject, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get correct => $composableBuilder(
+      column: $table.correct, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get total => $composableBuilder(
+      column: $table.total, builder: (column) => ColumnOrderings(column));
+}
+
+class $$SubjectScoresTableAnnotationComposer
+    extends Composer<_$AppDatabase, $SubjectScoresTable> {
+  $$SubjectScoresTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get subject =>
+      $composableBuilder(column: $table.subject, builder: (column) => column);
+
+  GeneratedColumn<int> get correct =>
+      $composableBuilder(column: $table.correct, builder: (column) => column);
+
+  GeneratedColumn<int> get total =>
+      $composableBuilder(column: $table.total, builder: (column) => column);
+}
+
+class $$SubjectScoresTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $SubjectScoresTable,
+    SubjectScore,
+    $$SubjectScoresTableFilterComposer,
+    $$SubjectScoresTableOrderingComposer,
+    $$SubjectScoresTableAnnotationComposer,
+    $$SubjectScoresTableCreateCompanionBuilder,
+    $$SubjectScoresTableUpdateCompanionBuilder,
+    (
+      SubjectScore,
+      BaseReferences<_$AppDatabase, $SubjectScoresTable, SubjectScore>
+    ),
+    SubjectScore,
+    PrefetchHooks Function()> {
+  $$SubjectScoresTableTableManager(_$AppDatabase db, $SubjectScoresTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$SubjectScoresTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$SubjectScoresTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$SubjectScoresTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> subject = const Value.absent(),
+            Value<int> correct = const Value.absent(),
+            Value<int> total = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              SubjectScoresCompanion(
+            subject: subject,
+            correct: correct,
+            total: total,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String subject,
+            Value<int> correct = const Value.absent(),
+            Value<int> total = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              SubjectScoresCompanion.insert(
+            subject: subject,
+            correct: correct,
+            total: total,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$SubjectScoresTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $SubjectScoresTable,
+    SubjectScore,
+    $$SubjectScoresTableFilterComposer,
+    $$SubjectScoresTableOrderingComposer,
+    $$SubjectScoresTableAnnotationComposer,
+    $$SubjectScoresTableCreateCompanionBuilder,
+    $$SubjectScoresTableUpdateCompanionBuilder,
+    (
+      SubjectScore,
+      BaseReferences<_$AppDatabase, $SubjectScoresTable, SubjectScore>
+    ),
+    SubjectScore,
+    PrefetchHooks Function()>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
   $AppDatabaseManager(this._db);
   $$QuizTableTableManager get quiz => $$QuizTableTableManager(_db, _db.quiz);
+  $$SubjectScoresTableTableManager get subjectScores =>
+      $$SubjectScoresTableTableManager(_db, _db.subjectScores);
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lottie/lottie.dart'; // ✅ Import Lottie
 
 class IntroPage extends StatefulWidget {
   const IntroPage({super.key});
@@ -18,7 +19,7 @@ class _IntroPageState extends State<IntroPage> {
 
     // ✅ Slight delay to simulate button press effect before navigating
     Future.delayed(const Duration(milliseconds: 150), () {
-      context.go('/loading');
+      context.go('/home');
     });
   }
 
@@ -32,14 +33,12 @@ class _IntroPageState extends State<IntroPage> {
         children: [
           const Spacer(), // Push content towards the center
 
-          // ✅ Fun emoji image
-          Image.asset(
-            'assets/images/emoji1.png',
-            width: 320,
-            height: 160,
+          SizedBox(
+            width: 200, 
+            height: 200,
+            child: Lottie.asset('assets/animations/think.json'), // ✅ Animated emoji
           ),
 
-          const SizedBox(height: 20),
 
           // ✅ Main title (fun heading)
           const Text(

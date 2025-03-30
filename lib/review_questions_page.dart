@@ -15,7 +15,8 @@ class ReviewQuestionsPage extends ConsumerWidget {
     final Map<String, dynamic> latestQuestionsMap = {};
 
     for (var question in answeredQuestions) {
-      latestQuestionsMap[question.question] = question; // This keeps overwriting, keeping the latest one
+      latestQuestionsMap[question.question] =
+          question; // This keeps overwriting, keeping the latest one
     }
 
     // ✅ Get the unique & latest questions
@@ -33,7 +34,8 @@ class ReviewQuestionsPage extends ConsumerWidget {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.white, size: 30),
+                icon:
+                    const Icon(Icons.arrow_back, color: Colors.white, size: 30),
                 onPressed: () => context.go('/score'),
               ),
             ),
@@ -66,13 +68,15 @@ class ReviewQuestionsPage extends ConsumerWidget {
 
           // ✅ List of Unique & Latest Questions
           else
+            // ✅ List of Unique & Latest Questions
             Expanded(
               child: ListView.builder(
                 padding: const EdgeInsets.all(16),
                 itemCount: uniqueLatestQuestions.length,
                 itemBuilder: (context, index) {
                   final question = uniqueLatestQuestions[index];
-                  final isCorrect = question.userAnswer == question.correctAnswer;
+                  final isCorrect =
+                      question.userAnswer == question.correctAnswer;
 
                   return Card(
                     elevation: 5,
@@ -92,7 +96,10 @@ class ReviewQuestionsPage extends ConsumerWidget {
                           // ✅ Question Text
                           Text(
                             question.question,
-                            style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600),
                           ),
                           const SizedBox(height: 10),
 
@@ -100,16 +107,20 @@ class ReviewQuestionsPage extends ConsumerWidget {
                           Text(
                             "Your Answer: ${question.userAnswer}",
                             style: TextStyle(
-                              color: isCorrect ? Colors.greenAccent : Colors.redAccent,
+                              color: isCorrect
+                                  ? Colors.greenAccent
+                                  : Colors.redAccent,
                               fontSize: 16,
                             ),
                           ),
 
-                          // ✅ Correct Answer
-                          Text(
-                            "Correct Answer: ${question.correctAnswer}",
-                            style: const TextStyle(color: Colors.white70, fontSize: 16),
-                          ),
+                          // ✅ Correct Answer (Shown Only If User Answered Wrong)
+                          if (!isCorrect)
+                            Text(
+                              "Correct Answer: ${question.correctAnswer}",
+                              style: const TextStyle(
+                                  color: Colors.white70, fontSize: 16),
+                            ),
                         ],
                       ),
                     ),

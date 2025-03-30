@@ -1,3 +1,5 @@
+import 'package:ReviseX/custom_quiz_setup.dart';
+import 'package:ReviseX/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -19,7 +21,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-       debugShowCheckedModeBanner: false, // ✅ Hides the debug banner
+      debugShowCheckedModeBanner: false, // ✅ Hides the debug banner
       title: 'Quiz App',
       theme: AppTheme.themeData,
       routerConfig: _router,
@@ -50,11 +52,18 @@ final GoRouter _router = GoRouter(
     ),
     GoRoute(
       path: '/loading',
-      pageBuilder: (context, state) => _fadeTransition(const LoadingPage()),
+      builder: (context, state) {
+        final quizType = state.extra as QuizType;
+        return LoadingPage(quizType: quizType);
+      },
     ),
     GoRoute(
       path: '/quiz',
       pageBuilder: (context, state) => _fadeTransition(const QuizPage()),
+    ),
+    GoRoute(
+      path: '/home',
+      pageBuilder: (context, state) => _fadeTransition(const HomePage()),
     ),
     GoRoute(
       path: '/score',
@@ -62,11 +71,18 @@ final GoRouter _router = GoRouter(
     ),
     GoRoute(
       path: '/review-questions',
-      pageBuilder: (context, state) => _fadeTransition(const ReviewQuestionsPage()),
+      pageBuilder: (context, state) =>
+          _fadeTransition(const ReviewQuestionsPage()),
     ),
     GoRoute(
       path: '/detailed-score',
-      pageBuilder: (context, state) => _fadeTransition(const DetailedScorePage()),
+      pageBuilder: (context, state) =>
+          _fadeTransition(const DetailedScorePage()),
+    ),
+        GoRoute(
+      path: '/custom_quiz_setup',
+      pageBuilder: (context, state) =>
+          _fadeTransition(const CustomQuizSetupPage()),
     ),
   ],
 );

@@ -33,20 +33,52 @@ class _QuizPageState extends ConsumerState<QuizPage> {
     super.dispose();
   }
 
-  void _startTimer() {
-    _timer?.cancel();
-    _timeLeft = 60;
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_timeLeft > 0) {
-        setState(() {
-          _timeLeft--;
-        });
-      } else {
-        timer.cancel();
-        _goToNextQuestion();
-      }
-    });
-  }
+void _startTimer() {
+  _timer?.cancel();
+  _timeLeft = 60;
+  _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    if (_timeLeft > 0) {
+      setState(() {
+        _timeLeft--;
+      });
+    } else {
+      timer.cancel();
+      _handleTimeout();
+    }
+  });
+}
+
+void _handleTimeout() {
+  if (!mounted || _answered) return;
+
+  final questions = ref.read(quizQuestionsProvider);
+  final currentIndex = _pageController.page?.toInt() ?? 0;
+  final question = questions[currentIndex];
+
+  // Record unanswered question due to timeout
+  final answeredQuestions = ref.read(answeredQuestionsProvider);
+  ref.read(answeredQuestionsProvider.notifier).state = [
+    ...answeredQuestions,
+    AnsweredQuestion(
+      question: question.question,
+      userAnswer: "Unanswered (Timeout)",
+      correctAnswer: getCorrectAnswerText(question),
+    ),
+  ];
+
+  // Update subject performance with timeout (counts towards total)
+  final subjectPerformance = ref.read(subjectPerformanceProvider);
+  final subject = question.subject;
+  subjectPerformance[subject] = SubjectStats(
+    correct: subjectPerformance[subject]?.correct ?? 0,
+    total: (subjectPerformance[subject]?.total ?? 0) + 1,
+  );
+  ref.read(subjectPerformanceProvider.notifier).state = {...subjectPerformance};
+
+  // Move to next question
+  _goToNextQuestion();
+}
+
 
   String getCorrectAnswerText(QuizData question) {
     switch (question.correctAnswer) {
